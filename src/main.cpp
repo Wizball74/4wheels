@@ -78,7 +78,7 @@ bool movementActive    = false;
 bool wasMoving         = false;
 bool lightStatus[4]    = {true, true, true, true};
 
-const uint8_t ledPins[4] = {LED_1, LED_2, LED_3, LED_4};
+constexpr uint8_t ledPins[4] = {LED_1, LED_2, LED_3, LED_4};
 
 //----------------------------------| DIRECTION ENUM |--------------------------------
 enum Direction {
@@ -137,7 +137,7 @@ int computeBaseSpeed(int x, int y) {
   int magnitude = max(abs(x), abs(y));
   magnitude = constrain(magnitude, JOY_DEADZONE, JOY_CENTER);
 
-  return map(magnitude, JOY_DEADZONE, JOY_CENTER, 0, MAX_SPEED);
+  return static_cast<int>(map(magnitude, JOY_DEADZONE, JOY_CENTER, 0, MAX_SPEED));
 }
 
 long snapToDetent(long pos) {
@@ -154,8 +154,8 @@ long snapToDetent(long pos) {
 //----------------------------------| LOGIC |-----------------------------------------
 void calculateWheelSpeeds() {
 
-  for (int i = 0; i < 4; i++) {
-    wheelSpeed[i] = 0;
+  for (int & i : wheelSpeed) {
+    i = 0;
   }
 
   Direction dir = getDirection(joyX, joyY);
@@ -166,14 +166,14 @@ void calculateWheelSpeeds() {
   switch (dir) {
 
         case DIR_N:
-      // Joystick nach oben -> physisch Nord
+      // Joystick nach oben → physisch Nord
       wheelSpeed[0] = baseSpeed;
       wheelSpeed[1] = sideSpeed;
       wheelSpeed[3] = sideSpeed;
       break;
 
     case DIR_S:
-      // Joystick nach unten -> physisch Süd
+      // Joystick nach unten → physisch Süd
       wheelSpeed[2] = baseSpeed;
       wheelSpeed[1] = sideSpeed;
       wheelSpeed[3] = sideSpeed;
@@ -277,14 +277,14 @@ void setup() {
   pinMode(LED_3, OUTPUT);
   pinMode(LED_4, OUTPUT);
 
-  for (int i = 0; i < 4; i++) {
-    digitalWrite(ledPins[i], LOW);
+  for (unsigned char ledPin : ledPins) {
+    digitalWrite(ledPin, LOW);
   }
 
-  for (int i = 0; i < 4; i++) {
-    stepper[i].setMaxSpeed(MAX_SPEED);
-    stepper[i].setAcceleration(SNAP_ACCEL);
-    stepper[i].setSpeed(0);
+  for (auto & i : stepper) {
+    i.setMaxSpeed(MAX_SPEED);
+    i.setAcceleration(SNAP_ACCEL);
+    i.setSpeed(0);
   }
 }
 
