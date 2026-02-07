@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <AccelStepper.h>
+#include <TM1637TinyDisplay.h>
+
 
 //----------------------------------| STEPPER PINS |----------------------------------
 #define STEP_MOTOR_01_1 14
@@ -50,6 +52,12 @@
 #define LED_2 34
 #define LED_3 36
 #define LED_4 38
+
+//----------------------------------| 4 DIGIT DISPLAY |------------------------------------------
+#define DIGIT_CLK 41
+#define DIGIT_DIO 43
+
+TM1637TinyDisplay digit(DIGIT_CLK, DIGIT_DIO);
 
 //----------------------------------| SPEED SETUP |-----------------------------------
 #define MAX_SPEED   600
@@ -254,6 +262,10 @@ void applyStepperSpeeds() {
   wasMoving = false;
 }
 
+void setDigit() {
+  //setting the display
+}
+
 //----------------------------------| SETUP |-----------------------------------------
 void setup() {
   Serial.begin(115200);
@@ -277,6 +289,11 @@ void setup() {
   pinMode(LED_3, OUTPUT);
   pinMode(LED_4, OUTPUT);
 
+  digit.begin();
+  digit.flipDisplay(true);
+  digit.showString("HELLO");
+  digit.setBrightness(8);
+
   for (unsigned char ledPin : ledPins) {
     digitalWrite(ledPin, LOW);
   }
@@ -286,10 +303,13 @@ void setup() {
     i.setAcceleration(SNAP_ACCEL);
     i.setSpeed(0);
   }
+  delay(500);
+  digit.clear();
 }
 
 //----------------------------------| LOOP |------------------------------------------
 void loop() {
+  setDigit();
   readInputs();
   calculateWheelSpeeds();
   applyStepperSpeeds();
